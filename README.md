@@ -1,7 +1,50 @@
 # 一、说明
-本代码库程序用于对 .hlkx 文件 EV 签名。
 
-# 二、使用
+用于对 `.hlkx` 文件进行 EV（Extended Validation）代码签名的命令行工具，基于 .NET Framework 4.8 开发。
+
+# 二、功能
+
+- 从当前用户个人证书库中查找指定指纹的 EV 签名证书
+- 使用 Windows 打包 API（`System.IO.Packaging`）对 `.hlkx` 文件进行数字签名
+- 将证书嵌入签名包中（`CertificateEmbeddingOption.InCertificatePart`）
+- 输出签名值的十六进制字符串
+
+# 三、前置条件
+
+- **操作系统**: Windows
+- **运行时**: .NET Framework 4.8 或更高版本
+- **证书**: 已安装 EV 代码签名证书至当前用户的个人证书存储区（"My"）
+
+# 四、构建
+
+使用 Visual Studio 或 MSBuild 打开 `winevsigner.sln` 解决方案文件即可编译：
+
 ```shell
-winevsigner.exe <thumpprint> <filepath.hlkx>
+msbuild winevsigner.sln /p:Configuration=Release
 ```
+
+编译产物位于 `bin\Release\winevsigner.exe`。
+
+# 五、使用
+
+```shell
+winevsigner.exe <证书指纹> <hlkx文件路径>
+```
+
+### 参数说明
+
+| 参数 | 说明 |
+|------|------|
+| `<证书指纹>` | EV 签名证书的 Thumbprint（指纹），不区分大小写 |
+| `<hlkx文件路径>` | 待签名的 `.hlkx` 文件路径 |
+
+### 示例
+
+```shell
+winevsigner.exe "A909502DD82AE41433E6F83886B00D4277A0A7B5" "C:\path\to\package.hlkx"
+```
+
+### 输出
+
+- 成功时输出签名值的十六进制字符串（标准输出）
+- 失败时输出错误信息到标准错误流，并以退出码 1 退出
